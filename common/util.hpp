@@ -1,46 +1,30 @@
 #pragma once
-#include <algorithm>
-#include <chrono>
-#include <cctype>
-#include <sstream>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
 
 namespace ts {
 
+// trim leading & trailing whitespace
 inline std::string trim(const std::string& s) {
-  size_t start = 0, end = s.size();
-  while (start < end && std::isspace(static_cast<unsigned char>(s[start]))) ++start;
-  while (end > start && std::isspace(static_cast<unsigned char>(s[end - 1]))) --end;
-  return s.substr(start, end - start);
+  size_t a = 0, b = s.size();
+  while (a < b && std::isspace(static_cast<unsigned char>(s[a]))) ++a;
+  while (b > a && std::isspace(static_cast<unsigned char>(s[b-1]))) --b;
+  return s.substr(a, b - a);
 }
 
-inline std::vector<std::string> split(const std::string& s, char delim) {
+// split on whitespace into tokens
+inline std::vector<std::string> tokens(const std::string& s) {
+  std::istringstream iss(s);
   std::vector<std::string> out;
-  std::stringstream ss(s);
-  std::string item;
-  while (std::getline(ss, item, delim)) out.push_back(item);
+  std::string t;
+  while (iss >> t) out.push_back(t);
   return out;
 }
 
-inline std::vector<std::string> tokens(const std::string& line) {
-  std::vector<std::string> toks;
-  std::string cur;
-  for (char c : line) {
-    if (std::isspace(static_cast<unsigned char>(c))) {
-      if (!cur.empty()) { toks.push_back(cur); cur.clear(); }
-    } else {
-      cur.push_back(c);
-    }
-  }
-  if (!cur.empty()) toks.push_back(cur);
-  return toks;
-}
-
-inline long long now_ns() {
-  return std::chrono::duration_cast<std::chrono::nanoseconds>(
-           std::chrono::steady_clock::now().time_since_epoch()).count();
-}
+// (Intentionally no now_ns() here; it lives in common/types.hpp)
 
 } // namespace ts
 

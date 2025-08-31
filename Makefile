@@ -5,7 +5,7 @@ BUILD    := build
 
 # Object files
 OBJS_COMMON := $(BUILD)/common/util.o $(BUILD)/common/logger.o
-OBJS_ENGINE := $(BUILD)/engine/order_book.o $(BUILD)/engine/matching_engine.o
+OBJS_ENGINE := $(BUILD)/engine/matching_engine.o
 OBJS_CLI    := $(BUILD)/cli/tradesim_cli.o
 OBJS_TEST   := $(BUILD)/tests/smoke_test.o
 OBJS_SERVER := $(BUILD)/net/server.o $(BUILD)/net/main_server.o

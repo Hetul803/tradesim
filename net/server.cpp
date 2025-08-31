@@ -35,19 +35,17 @@ bool Server::setup_listener() {
 }
 
 void Server::init_logs() {
-  // session id based on monotonic time (ns) to avoid collisions
   session_id_ = std::to_string(now_ns());
-  // Open logs/* files with headers
   (void)log_trades_.open("logs/" + session_id_ + "_trades.csv",
-                         {"ts_ns","maker_id","taker_id","qty","px"});
+    {"ts_ns","maker_id","taker_id","qty","px",
+     "maker_client","taker_client","maker_side","taker_side"});
   (void)log_book_.open("logs/" + session_id_ + "_book.csv",
-                       {"ts_ns","has_bid","bid_px","bid_qty","has_ask","ask_px","ask_qty"});
+    {"ts_ns","has_bid","bid_px","bid_qty","has_ask","ask_px","ask_qty"});
 }
 
 void Server::run() {
   if (!setup_listener()) return;
   init_logs();
-
   running_.store(true);
   std::cout << "Server listening on port " << port_ << "  (session " << session_id_ << ")\n";
 
@@ -147,7 +145,7 @@ void Server::handle_client(int cfd) {
       continue;
     }
 
-    // Order entry (same command shapes as CLI)
+    // Order entry
     try {
       if (toks.size() >= 8 && toks[0]=="NEW" && toks[1]=="LIMIT" && toks[6]=="CLIENT") {
         Side side = (toks[2]=="BUY") ? Side::Buy : Side::Sell;
@@ -160,10 +158,8 @@ void Server::handle_client(int cfd) {
           std::lock_guard<std::mutex> lk(eng_mu_);
           trades = engine_.new_limit_order(client, side, qty, px);
         }
-        // log trades
         if (!trades.empty()) {
           std::lock_guard<std::mutex> lk(trades_mu_);
-          for (auto& tr : trades_) { (void)tr; } // keep vector warm
           for (auto& tr : trades) {
             trades_.push_back(tr);
             log_trades_.write_row({
@@ -171,7 +167,11 @@ void Server::handle_client(int cfd) {
               std::to_string(tr.maker_id),
               std::to_string(tr.taker_id),
               std::to_string(tr.qty),
-              std::to_string(tr.px)
+              std::to_string(tr.px),
+              tr.maker_client,
+              tr.taker_client,
+              (tr.maker_side==Side::Buy?"BUY":"SELL"),
+              (tr.taker_side==Side::Buy?"BUY":"SELL")
             });
           }
         }
@@ -186,7 +186,6 @@ void Server::handle_client(int cfd) {
           std::lock_guard<std::mutex> lk(eng_mu_);
           trades = engine_.new_market_order(client, side, qty);
         }
-        // log trades
         if (!trades.empty()) {
           std::lock_guard<std::mutex> lk(trades_mu_);
           for (auto& tr : trades) {
@@ -196,7 +195,11 @@ void Server::handle_client(int cfd) {
               std::to_string(tr.maker_id),
               std::to_string(tr.taker_id),
               std::to_string(tr.qty),
-              std::to_string(tr.px)
+              std::to_string(tr.px),
+              tr.maker_client,
+              tr.taker_client,
+              (tr.maker_side==Side::Buy?"BUY":"SELL"),
+              (tr.taker_side==Side::Buy?"BUY":"SELL")
             });
           }
         }
