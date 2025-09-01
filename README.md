@@ -51,8 +51,11 @@ tradesim/
 └── logs/                  # Trade & book CSV logs (gitignored)
 
 ---
-## 📦 Quick Start
 
+
+
+```
+## 📦 Quick Start
 ```bash
 # Clone the repository
 git clone https://github.com/Hetul803/tradesim.git
@@ -89,7 +92,7 @@ streamlit run scripts/dashboard.py
 
 # CLI PnL report
 ./scripts/pnl.py
-
+```
 👨‍🏫 Classroom and Research Use
 AUM TradeSim was developed by Hetul Patel (MSCS) as a teaching and research platform for:
 Quantitative finance
@@ -102,7 +105,9 @@ Students connect with Trader UI from their laptops.
 Bots provide liquidity and competition.
 Dashboard tracks performance and leaderboard results in real time.
 
+
 🧩 Roadmap
+```bash
 Order IDs and cancel functionality
 Full order book depth visualization
 Multiple trading symbols
@@ -111,9 +116,11 @@ Advanced analytics (queue depth, latency)
 WebSocket streaming for low-latency dashboards
 Student competition leaderboard
 
+```
 📝 License & Ownership
+```bash
 This simulator is owned and maintained by Hetul Patel.
 Developed for educational and research purposes at Auburn University at Montgomery.
 You are welcome to fork, contribute, or extend this code, but please credit:
-Hetul Patel
+Hetul Patel.
 GitHub: Hetul803
